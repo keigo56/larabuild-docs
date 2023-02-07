@@ -1,0 +1,24 @@
+{
+  "name": "larabuild-docs",
+  "version": "0.0.1",
+  "description": "Larabuild is a collective documentation for building Laravel Powered Applications using VueJS as the frontend framework",
+  "main": "index.js",
+  "authors": {
+    "name": "Keigo Victor Fujita",
+    "email": "keigofujita19@gmail.com"
+  },
+  "repository": "/larabuild-docs",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.9.8"
+  },
+  "dependencies": {
+    "@dovyp/vuepress-plugin-clipboard-copy": "^1.0.0-alpha.7",
+    "vuepress-plugin-code-copy": "^1.0.6",
+    "vuepress-theme-default-prefers-color-scheme": "^2.0.0"
+  }
+}
