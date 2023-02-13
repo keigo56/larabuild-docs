@@ -1,4 +1,4 @@
-# Running Laravel Project in VSCode
+# Running Laravel Project
 
 To serve the Laravel application, open terminal and run: 
 
