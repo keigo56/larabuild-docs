@@ -80,6 +80,15 @@ module.exports = {
                         'running-project',
                         'setup-github-repository',
                     ]
+                },
+                {
+                    title: 'Setup Database',
+                    collapsable: false,
+                    children: [
+                        'create-migrations',
+                        'create-models',
+                        'create-seeders',
+                    ]
                 }
             ],
         }
