@@ -60,14 +60,6 @@ module.exports = {
                     }
                 ]
             }
-            // {
-            //   text: 'Config',
-            //   link: '/config/'
-            // },
-            // {
-            //   text: 'VuePress',
-            //   link: 'https://v1.vuepress.vuejs.org'
-            // }
         ],
         sidebar: {
             '/laravel/': [
@@ -88,6 +80,21 @@ module.exports = {
                         'create-migrations',
                         'create-models',
                         'create-seeders',
+                    ]
+                },
+                {
+                    title: 'Setup Authentication',
+                    collapsable: false,
+                    children: [
+                        'setup-azure-sso',
+                    ]
+                },
+                {
+                    title: 'Setup Roles and Permission',
+                    collapsable: false,
+                    children: [
+                        'setup-laravel-spatie-roles-and-permission',
+                        'apply-roles-and-permission-middleware-to-routes',
                     ]
                 }
             ],
