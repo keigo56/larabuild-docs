@@ -93,8 +93,8 @@ module.exports = {
                     title: 'Setup Roles and Permission',
                     collapsable: false,
                     children: [
-                        'setup-laravel-spatie-roles-and-permission',
-                        'apply-roles-and-permission-middleware-to-routes',
+                        // 'setup-laravel-spatie-roles-and-permission',
+                        // 'apply-roles-and-permission-middleware-to-routes',
                     ]
                 }
             ],
