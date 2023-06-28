@@ -96,6 +96,13 @@ module.exports = {
                         // 'setup-laravel-spatie-roles-and-permission',
                         // 'apply-roles-and-permission-middleware-to-routes',
                     ]
+                },
+                {
+                    title: 'API Endpoint',
+                    collapsable: false,
+                    children: [
+                        'create-new-api-endpoint'
+                    ]
                 }
             ],
         }

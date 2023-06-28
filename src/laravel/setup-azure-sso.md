@@ -34,13 +34,16 @@ Now that we have installed the required packages, we can now start building our 
 1. Go to <code>app/</code> directory and create a new folder named <code>Services</code>
 2. Inside the <code>app/Services/</code> directory, create a new PHP class named <code>AzureSSOService</code>
 3. Copy and paste this code inside the <code>AzureSSOService</code> class:
-``` php
+```php
 <?php
 
 namespace App\Services;
 
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\GenericProvider;
+use League\OAuth2\Client\Token\AccessToken;
 use Microsoft\Graph\Exception\GraphException;
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model\User;
@@ -50,9 +53,9 @@ class AzureSSOService
     /*
      * Returns the Azure OAuth Client which can be used to connect to Azure AD API
      * */
-    private function getOAuthClient(): \League\OAuth2\Client\Provider\GenericProvider
+    private function getOAuthClient(): GenericProvider
     {
-       return new \League\OAuth2\Client\Provider\GenericProvider([
+       return new GenericProvider([
             'clientId'                => config('services.azure.app_id'),
             'clientSecret'            => config('services.azure.secret'),
             'redirectUri'             => config('services.azure.redirect_uri'),
@@ -87,18 +90,22 @@ class AzureSSOService
     /*
      * Returns if the OAuth State is valid
      * */
-    public function isValidOAuthState(string $expectedState, string $providedState): bool
+
+    /**
+     * @throws Exception
+     */
+    public function isValidOAuthState(string|null $expectedState, string|null $providedState): bool
     {
         if (!isset($expectedState)) {
-            return false;
+            throw new Exception('Invalid OAuth State');
         }
 
         if (!isset($providedState)) {
-            return false;
+            throw new Exception('Invalid OAuth State');
         }
 
         if ($expectedState !== $providedState) {
-            return false;
+            throw new Exception('Invalid OAuth State');
         }
 
         return true;
@@ -107,10 +114,13 @@ class AzureSSOService
     /*
      * Returns if the OAuth Code is valid
      * */
+    /**
+     * @throws Exception
+     */
     public function isValidAuthorizationCode(string $authorizationCode): bool
     {
         if (!isset($authorizationCode)) {
-            return false;
+            throw new Exception('Invalid Authorization Code');
         }
 
         return true;
@@ -119,7 +129,10 @@ class AzureSSOService
     /*
     * Returns the access token to be used in querying the Microsoft Graph API
     * */
-    public function getAccessToken(string $authorizationCode): \League\OAuth2\Client\Token\AccessToken|bool
+    /**
+     * @throws Exception
+     */
+    public function getAccessToken(string $authorizationCode): AccessToken|bool
     {
         /*
         * Initialize the Oauth Client to use Azure AD API
@@ -131,14 +144,17 @@ class AzureSSOService
                 'code' => $authorizationCode
             ]);
         }catch (IdentityProviderException $e) {
-            return false;
+            throw new Exception('Cannot get access token for OAuth Client');
         }
     }
 
     /*
-    * Returns the authenticated user from Azure AD 
+    * Returns the authenticated user from Azure AD
     * */
-    public function getAzureSSOUser(\League\OAuth2\Client\Token\AccessToken $token)
+    /**
+     * @throws Exception
+     */
+    public function getAzureSSOUser(AccessToken $token)
     {
         /*
          * Initializes the Microsoft Graph API
@@ -153,7 +169,7 @@ class AzureSSOService
                 ->setReturnType(User::class)
                 ->execute();
         } catch (GuzzleException|GraphException $e) {
-            return false;
+            throw new Exception('Cannot get Azure SSO User');
         }
     }
 }
@@ -174,6 +190,7 @@ namespace App\Http\Controllers\Authentication;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\AzureSSOService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -194,81 +211,72 @@ class AzureSSOController extends Controller
     public function app_sso_callback(Request $request)
     {
 
-        $azureService = new AzureSSOService();
+        try {
+
+            $azureService = new AzureSSOService();
+            $expectedState = session('oauthState');
+            $request->session()->forget('oauthState');
+            $providedState = $request->query('state');
+
+            $azureService->isValidOAuthState($expectedState, $providedState);
+            $authorizationCode = $request->query('code');
+            $azureService->isValidAuthorizationCode($authorizationCode);
+            $accessToken = $azureService->getAccessToken($authorizationCode);
+            $authenticatedUser = $azureService->getAzureSSOUser($accessToken);
 
 
-        $expectedState = session('oauthState');
-        $request->session()->forget('oauthState');
-        $providedState = $request->query('state');
-
-        if(!$azureService->isValidOAuthState($expectedState, $providedState)){
-            return response()->json([
-                'error' => 'Not a valid state'
-            ]);
-        }
-
-        $authorizationCode = $request->query('code');
-        if(!$azureService->isValidAuthorizationCode($authorizationCode)){
-            return response()->json([
-                'error' => 'Not a valid authorization code'
-            ]);
-        }
-
-        $accessToken = $azureService->getAccessToken($authorizationCode);
-
-        if($accessToken === false){
-            return response()->json([
-                'error' => 'Invalid Access Token'
-            ]);
-        }
-
-        $authenticatedUser = $azureService->getAzureSSOUser($accessToken);
-
-        if($authenticatedUser === false){
-            return response()->json([
-                'error' => 'Cannot retrieve authenticated user'
-            ]);
-        }
-
-        $userExists = User::query()
-            ->where('email', '=', $authenticatedUser->getMail())
-            ->exists();
-
-
-        $user = !$userExists ?
-            User::query()
-                ->create([
-                    'email' => $authenticatedUser->getMail(),
-                    'name' => $authenticatedUser->getDisplayName(),
-                    'password' => Hash::make('password'),
-                ]) :
-            User::query()
+            /*
+             * Checks on the database if the user email exists on "users" table
+             * */
+            $userExists = User::query()
                 ->where('email', '=', $authenticatedUser->getMail())
-                ->first();
+                ->exists();
 
 
-        /*
-         * Delete all active tokens of the user
-         * This is to ensure that only one session is active at a time
-         * */
-        $user->tokens()->delete();
+            /*
+             * If the user does not exist in the database,
+             * create a new user record with the authenticated user's email and display name.
+             * Otherwise, retrieve the existing user record from the database.
+             * */
+
+            $user = !$userExists ?
+                User::query()
+                    ->create([
+                        'email' => $authenticatedUser->getMail(),
+                        'name' => $authenticatedUser->getDisplayName(),
+                        'password' => Hash::make('password'),
+                    ]) :
+                User::query()
+                    ->where('email', '=', $authenticatedUser->getMail())
+                    ->first();
 
 
-        /*
-         * Create the access token
-         * Note that by default, this access token does not expire
-         * We can update the expiration duration in the config settings
-         * */
-        $access_token = $user->createToken('access_token')->plainTextToken;
+            /*
+             * Delete all active tokens of the user
+             * This is to ensure that only one session is active at a time
+             * */
+            $user->tokens()->delete();
 
-        /*
-         * This is only a temporary implementation
-         * Once the frontend is ready, we can forward the access token to our frontend URL
-         * */
-        return response()->json([
-            'user' => $user->getAttribute('email'),
-            'token' => $access_token,
-        ]);
+            /*
+             * Create the access token
+             * Note that by default, this access token does not expire
+             * We can update the expiration duration in the config settings
+             * */
+            $access_token = $user->createToken('access_token')->plainTextToken;
+
+            /*
+             * Forward the access token to our frontend URL
+             * */
+
+            $forwardURL = config('services.azure.frontend_uri') . "/auth/validate?token={$access_token}";
+
+            return redirect()->away($forwardURL);
+
+        }catch (Exception $exception){
+            return response()->json([
+                'error' => $exception->getMessage()
+            ], 500);
+        }
     }
 
     public function sso_logout()
@@ -285,6 +293,7 @@ class AzureSSOController extends Controller
         ]);
     }
 }
+
 ```
 
 ## Create Azure SSO Routes
@@ -308,5 +317,27 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('sso/login', [AzureSSOController::class, 'app_sso_login'])->name('app.sso.login');
 Route::get('sso/callback', [AzureSSOController::class, 'app_sso_callback'])->name('app.sso.callback');
+```
+
+To register our logout endpoint, open <code>api.php</code> routes file and paste the following:
+
+```php
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+
+Route::middleware('auth:sanctum')->delete('/auth/logout', [\App\Http\Controllers\Authentication\AzureSSOController::class, 'sso_logout']);
 
 ```
