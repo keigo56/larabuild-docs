@@ -105,6 +105,32 @@ module.exports = {
                     ]
                 }
             ],
+            '/vue/': [
+                {
+                    title: 'Setup A Vue Project',
+                    collapsable: false,
+                    children: [
+                        '',
+                        'open-project-vs-code',
+                        'running-project',
+                        'setup-github-repository',
+                    ]
+                },
+                {
+                    title: 'Create Page',
+                    collapsable: false,
+                    children: [
+                        'create-page',
+                    ]
+                },
+                {
+                    title: 'Create Component',
+                    collapsable: false,
+                    children: [
+                        'create-component',
+                    ]
+                },
+            ]
         }
     },
 
