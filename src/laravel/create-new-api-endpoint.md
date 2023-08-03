@@ -210,4 +210,5 @@ Creating a proper API response in Laravel involves structuring the response in a
     - 401 Unauthorized: The request requires user authentication. The client must provide valid credentials (such as a username and password) to access the requested resource.
     - 403 Forbidden: The server understood the request, but the client does not have the necessary permissions to access the requested resource. Unlike 401, authentication will not help in this case.
     - 404 Not Found: The server could not find the requested resource. This response code is often used when the URL or endpoint does not exist or when a specific resource cannot be found.
+## Add Endpoint Logging
 ## Setup API Middleware

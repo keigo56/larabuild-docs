@@ -82,28 +82,42 @@ module.exports = {
                         'create-seeders',
                     ]
                 },
-                {
-                    title: 'Setup Authentication',
-                    collapsable: false,
-                    children: [
-                        'setup-azure-sso',
-                    ]
-                },
-                {
-                    title: 'Setup Roles and Permission',
-                    collapsable: false,
-                    children: [
-                        // 'setup-laravel-spatie-roles-and-permission',
-                        // 'apply-roles-and-permission-middleware-to-routes',
-                    ]
-                },
+                // {
+                //     title: 'Setup Authentication',
+                //     collapsable: false,
+                //     children: [
+                //         'setup-azure-sso',
+                //     ]
+                // },
+                // {
+                //     title: 'Setup Roles and Permission',
+                //     collapsable: false,
+                //     children: [
+                //         // 'setup-laravel-spatie-roles-and-permission',
+                //         // 'apply-roles-and-permission-middleware-to-routes',
+                //     ]
+                // },
                 {
                     title: 'API Endpoint',
                     collapsable: false,
                     children: [
                         'create-new-api-endpoint'
                     ]
-                }
+                },
+                {
+                    title: 'Setup Datatables',
+                    collapsable: false,
+                    children: [
+                        'setup-datatables'
+                    ]
+                },
+                {
+                    title: 'Authentication',
+                    collapsable: false,
+                    children: [
+                        'setup-azure-sso'
+                    ]
+                },
             ],
             '/vue/': [
                 {
@@ -125,6 +139,27 @@ module.exports = {
                 },
                 {
                     title: 'Create Component',
+                    collapsable: false,
+                    children: [
+                        'create-component',
+                    ]
+                },
+                {
+                    title: 'Setup Datatable',
+                    collapsable: false,
+                    children: [
+                        'create-component',
+                    ]
+                },
+                {
+                    title: 'Setup Modals',
+                    collapsable: false,
+                    children: [
+                        'create-component',
+                    ]
+                },
+                {
+                    title: 'Setup Forms',
                     collapsable: false,
                     children: [
                         'create-component',

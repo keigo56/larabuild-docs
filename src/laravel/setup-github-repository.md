@@ -90,16 +90,39 @@ Click <code>File >> Add a local repository</code> and select the project folder.
       ``` bash
       cp .env.example .env
       ```
-   4. Generate a project key. The project key is what Laravel uses to encrypt data within the application:
+      
+   4. Open <code>.env</code> file and update the values on the keys below:
+      ``` dotenv
+      OAUTH_APP_ID=
+      OAUTH_APP_SECRET=
+      ```
+      
+   5. Generate a project key. The project key is what Laravel uses to encrypt data within the application:
       ``` bash
       php artisan key:generate
-      ```         
-   5. Open the project in VsCode:
+      ```
+      
+   6. Open Workbench and create schema. Update the database related credentials on the <code>.env</code> file.
+      ``` dotenv
+      DB_CONNECTION=mysql
+      DB_HOST=127.0.0.1
+      DB_PORT=3306
+      DB_DATABASE=cnx_laravel_project_scaffold
+      DB_USERNAME=root
+      DB_PASSWORD=
+      ```
+      
+   7. Run the command below to run migrations and seeders:
+      ``` bash
+      php artisan migrate:fresh --seed
+      ```  
+      
+   8. Open the project in VsCode:
       ``` bash
       code .
       ```
-   6. Run the project:
+   9. Run the project:
       ``` bash
       php artisan serve
-      ```       
+      ```   
    
