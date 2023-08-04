@@ -41,6 +41,11 @@ Copy <code>.env.example</code> file to <code>.env</code>. The <code>.env</code> 
 cp .env.example .env
 ```
 
+Open project in VsCode:
+``` bash
+code .
+```
+
 Open <code>.env</code> file and update the values on the keys below:
 ``` dotenv
 OAUTH_APP_ID=
@@ -52,7 +57,7 @@ Generate a project key. The project key is what Laravel uses to encrypt data wit
 php artisan key:generate
 ```
 
-Open Workbench and create schema. Update the database related credentials on the <code>.env</code> file. 
+Open MySQL Workbench or PhpMyAdmin and create a new database. Update the database related credentials on the <code>.env</code> file. 
 ``` dotenv
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -67,10 +72,6 @@ Run the command below to run migrations and seeders:
 php artisan migrate:fresh --seed
 ```  
 
-Open the project in VsCode:
-``` bash
-code .
-```
 Run the project:
 ``` bash
 php artisan serve
