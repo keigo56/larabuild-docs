@@ -64,12 +64,13 @@ module.exports = {
         sidebar: {
             '/laravel/': [
                 {
-                    title: 'Setup A Laravel Project',
+                    title: 'Setup Laravel Project',
                     collapsable: false,
                     children: [
                         '',
                         'open-project-vs-code',
                         'running-project',
+                        'installing-vs-code-extensions',
                         'setup-github-repository',
                     ]
                 },
