@@ -1,4 +1,4 @@
-# Create Page
+# Setup Modals
 
 1. Create a page component in <code>src/pages</code> directory. Make sure that the component name ends in <code>Page</code> to easily identify page components. Examples are <code>DriverIndexPage</code>, <code>UserIndexPage</code>, <code>UserEditPage</code>.
    ``` vue

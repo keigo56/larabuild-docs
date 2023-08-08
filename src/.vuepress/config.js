@@ -127,6 +127,7 @@ module.exports = {
                     children: [
                         '',
                         'open-project-vs-code',
+                        'installing-vs-code-extensions',
                         'running-project',
                         'setup-github-repository',
                     ]
@@ -149,21 +150,21 @@ module.exports = {
                     title: 'Setup Datatable',
                     collapsable: false,
                     children: [
-                        'create-component',
+                        'setup-datatables',
                     ]
                 },
                 {
                     title: 'Setup Modals',
                     collapsable: false,
                     children: [
-                        'create-component',
+                        'setup-modals',
                     ]
                 },
                 {
                     title: 'Setup Forms',
                     collapsable: false,
                     children: [
-                        'create-component',
+                        'setup-forms',
                     ]
                 },
             ]
