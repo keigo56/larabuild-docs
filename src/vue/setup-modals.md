@@ -1,56 +1,136 @@
 # Setup Modals
 
-1. Create a page component in <code>src/pages</code> directory. Make sure that the component name ends in <code>Page</code> to easily identify page components. Examples are <code>DriverIndexPage</code>, <code>UserIndexPage</code>, <code>UserEditPage</code>.
-   ``` vue
+## Creating Modals
+1. Create a new modal component inside <code>src/pages</code> directory. For this example we will create a new modal component named <code>AddUserModal</code>:
+   ```vue
    <template>
-    <!-- This is where we code the HTML of the component -->
+     <BaseModal title="Add User" :is-open="isOpen" width="40rem">
+       <div class="py-5">
+         Modal Contents Here
+       </div>
+       <div class="mt-4 flex space-x-2">
+         <button
+             @click="closeModal"
+             type="button"
+             class="inline-flex justify-center rounded-md border border-transparent bg-brand-800 text-gray-100 dark:text-white px-4 py-2 text-sm font-medium dark:hover:bg-brand-700 hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+         >
+           Close Modal
+         </button>
+       </div>
+     </BaseModal>
    </template>
-    
+   
    <script setup>
-    /* This is where we define Javascript to make our component dynamic */
+   import BaseModal from "@/components/overlays/BaseModal.vue";
+   import { ref } from "vue";
+   
+   const isOpen = ref(false);
+   
+   defineExpose({
+     openModal,
+     closeModal,
+   });
+   
+   function openModal() {
+     isOpen.value = true;
+   }
+   
+   function closeModal() {
+     isOpen.value = false;
+   }
+   
    </script>
    ```
-2. After the page component has been created, we can now register our page component in our routes. Open <code>routes/routes.js</code> file and add the following code:
-   ```js
-   {
-       path: "/users",
-       component: UsersIndexPage,
-       meta: {
-      		middleware: ["auth", "can:view_users"],
-       },
-   },
+   
+## Using Modals
+2. Open the page component where you wanted to add the modal component. In this example, we'll add <code>AddUserModal</code> modal to <code>UserIndexPage</code> component.
+   ```vue
+   <template>
+     <BaseLayout>
+       <div class="p-5">
+         <h1 class="font-semibold text-2xl dark:text-white">Users Page</h1>
+         <DataTable
+             source-url="/api/datatable/users"
+         >
+           <template #actionItems>
+             <button
+                 @click="addUserModal.openModal()"
+                 type="button"
+                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+             >
+               <PlusIcon class="w-4 h-4 mr-2 inline" />
+               <span>Add User</span>
+             </button>
+           </template>
+   
+           <template v-slot:rowActionItems="props">
+             <a
+                 href="#"
+                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+             >
+               Edit
+             </a>
+           </template>
+   
+         </DataTable>
+       </div>
+     </BaseLayout>
+     <AddUserModal ref="addUserModal"/>
+   </template>
+   
+   <script setup>
+   import { PlusIcon } from "@heroicons/vue/24/outline/index.js";
+   import BaseLayout from "@/layouts/BaseLayout.vue";
+   import DataTable from "@/modules/datatable/DataTable.vue";
+   import AddUserModal from "@/pages/AddUserModal.vue";
+   import {ref} from "vue";
+   
+   const addUserModal = ref(null);
+   
+   </script>
    ```
-   - <code>path: "/users"</code> is the URL Path to access the page component
-   - <code>component: UsersIndexPage</code> indicates what component to instantiate when the user access the URL path defined above
-   - <code>middleware: ["auth", "can:view_users"]</code> tells what middleware is needed on accessing the page. The <code>auth</code> means that only authenticated users can access the route and <code>can:view_users</code> is a permission middleware checking if the user has <code>view_users</code> permissions.
- 
-3. We can now customize the design of our page. We can use pre-defined layouts or we can create our own layout. 
-    ```vue
-    <template>
-      <BaseLayout>
-        <div class="p-5">
-          <h1 class="font-semibold text-2xl dark:text-white">Users Page</h1>
-        </div>
-      </BaseLayout>
-    </template>
-    
-    <script setup>
-    import BaseLayout from "@/layouts/BaseLayout.vue";
-    </script>
-    ```
-    This is what it will look like once we visit the <code>/users</code> page in the browser.
-  
-   ![Sample user page](./sample-users-page.png)
-4. Depending on the page, we may need to add a sidebar item in our sidebar navigation to access the page we created. To add a sidebar item open <code>components/navigation/Sidebar.vue</code> component and add the following lines:
-   ```js
-   {
-     label: "Users",
-     href: "/users",
-     active: isCurrentPath("/users"),
-     visible: hasPermission("view_users"),
-   },   
-   ```
-   This is what it will look like once we visit the <code>/users</code> page in the browser.
+## Customizing Modals
+We can customize the modal via BaseModal props. Consider the following example:
+```vue{2}
+<template>
+  <BaseModal title="Add User" :is-open="isOpen" width="40rem">
+    <div class="py-5">
+      Modal Contents Here
+    </div>
+    <div class="mt-4 flex space-x-2">
+      <button
+          @click="closeModal"
+          type="button"
+          class="inline-flex justify-center rounded-md border border-transparent bg-brand-800 text-gray-100 dark:text-white px-4 py-2 text-sm font-medium dark:hover:bg-brand-700 hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+      >
+        Close Modal
+      </button>
+    </div>
+  </BaseModal>
+</template>
 
-   ![Sample user page](./sample-users-page-sidebar.png)
-   You'll notice that there is a new sidebar item created under the Products module. You may customize the entire sidebar layout depending on the project. 
+<script setup>
+import BaseModal from "@/components/overlays/BaseModal.vue";
+import { ref } from "vue";
+
+const isOpen = ref(false);
+
+defineExpose({
+  openModal,
+  closeModal,
+});
+
+function openModal() {
+  isOpen.value = true;
+}
+
+function closeModal() {
+  isOpen.value = false;
+}
+
+</script>
+```
+On the highlighted code:
+- <code>title</code>: Specifies the title displayed on the modal
+- <code>is-open</code>: Specifies which variable controls the visibility of the modal. In the example the <code>isOpen</code> variable is used.
+- <code>width</code>: Specifies width of the modal
