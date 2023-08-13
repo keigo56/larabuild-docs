@@ -71,6 +71,7 @@ module.exports = {
                         'open-project-vs-code',
                         'running-project',
                         'installing-vs-code-extensions',
+                        'installing-chrome-extensions',
                         'setup-github-repository',
                     ]
                 },
@@ -165,6 +166,13 @@ module.exports = {
                     collapsable: false,
                     children: [
                         'setup-forms',
+                    ]
+                },
+                {
+                    title: 'Vue 3 Tutorial',
+                    collapsable: false,
+                    children: [
+                        'vue-tutorial',
                     ]
                 },
             ]
