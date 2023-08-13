@@ -1,4 +1,4 @@
-# Install VS Code Extensions
+# Install Chrome Extensions
 
 Install the below Chrome extensions for Vue SPA Development:
 
