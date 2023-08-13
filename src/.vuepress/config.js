@@ -71,7 +71,6 @@ module.exports = {
                         'open-project-vs-code',
                         'running-project',
                         'installing-vs-code-extensions',
-                        'installing-chrome-extensions',
                         'setup-github-repository',
                     ]
                 },
